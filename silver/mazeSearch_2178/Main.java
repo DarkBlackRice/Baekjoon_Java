@@ -46,7 +46,7 @@ public class Main {
 				nr = coord[0] + dr[i];
 				nc = coord[1] + dc[i];
 				if (0<=nr && nr<N && 0<=nc && nc<M && vst[nr][nc] == 0 && arr[nr][nc] == '1') {
-					vst[nr][nc] = vst[coord[0]][coord[1]] + 1;s
+					vst[nr][nc] = vst[coord[0]][coord[1]] + 1;
 					if(nr==N-1 && nc == M-1) return vst[nr][nc];
 					q.add(new int[] {nr, nc});
 				}
