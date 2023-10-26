@@ -7,7 +7,8 @@ import java.util.StringTokenizer;
 
 public class Main {
 
-	static int N, K, tmp, max = Integer.MIN_VALUE, ans;
+	static int N, K, tmp;
+	static long ans, max = 0;
 	static int arr[], dist[];
 
 	public static void main(String[] args) throws IOException {
@@ -31,11 +32,11 @@ public class Main {
 		System.out.println(ans);
 	}
 	
-	private static void binarySearch(int start, int end) {
+	private static void binarySearch(long start, long end) {
 		
 		if (start > end) return;
 		
-		int mid = (start+end) / 2;
+		long mid = (start+end) / 2;
 		tmp = 0;
 		for (int i = 0; i < K; i++) {
 			tmp += arr[i] / mid;
