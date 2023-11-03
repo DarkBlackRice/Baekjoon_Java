@@ -10,9 +10,8 @@ import java.util.StringTokenizer;
 
 public class Main {
 
-	static int N, K, w;
-	static int dp[], comp[], weight[];
-	static boolean flag;
+	static int N, K, w, v;
+	static int dp[];
 
 	public static void main(String[] args) throws IOException {
 		
@@ -21,37 +20,18 @@ public class Main {
 		
 		N = Integer.parseInt(st.nextToken());
 		K = Integer.parseInt(st.nextToken());
-		
-		weight = new int[N];
-		
+		dp = new int[K+1];
+
 		for (int i = 0; i < N; i++) {
 		
 			st = new StringTokenizer(br.readLine());
 			w = Integer.parseInt(st.nextToken());
-			weight[i] = w;
+			v = Integer.parseInt(st.nextToken());
 			
-		}
-		
-		Arrays.sort(weight);
-		dp = new int[K+1];
-		
-		
-		for (int i = 0; i <= K; i++) {
-			flag=false;
-			comp = new int[N];
-			Arrays.fill(comp, Integer.MAX_VALUE);
-			for (int j = 0; j < N; j++) {
-				w = weight[j];
-				if (i<w) break;
-				flag = true;
-				comp[j] = dp[i-w] + 1;
+			for (int j = K; j>= w; j--) {
+				dp[j] = Math.max(dp[j-w] + v, dp[j]);
 			}
-			if(flag) {
-				dp[i] = Integer.MAX_VALUE;
-				for (int j = 0; j < N; j++) {
-					if(dp[i] > comp[j]) dp[i] = comp[j];
-				}
-			}
+			
 		}
 		
 		System.out.println(Arrays.toString(dp));
