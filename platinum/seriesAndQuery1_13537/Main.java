@@ -3,86 +3,79 @@ package platinum.seriesAndQuery1_13537;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.Map;
-import java.util.StringTokenizer;
-import java.util.TreeMap;
+import java.util.*;
 
 public class Main {
 
-    static int N, M, result;
+    static int N, M;
     static int[] arr;
-    static Integer temp;
-    static TreeMap<Integer, Integer>[] segTree;
-    static Map.Entry<Integer, Integer> entry;
+    static int[][] mergeSortTree;
+
+    public static int[] merge(int[] arr1, int[] arr2){
+        int len1 = arr1.length;
+        int len2 = arr2.length;
+        int len = len1 + len2;
+
+        int idx, i, j;
+        idx = i = j = 0;
+
+        int[] res = new int[len];
+        while(idx < len){
+            if (j == len2 || (i < len1 && (arr1[i] < arr2[j]))) {
+                res[idx++] = arr1[i++];
+            } else {
+                res[idx++] = arr2[j++];
+            }
+        }
+        return res;
+    }
 
     public static void init(int node, int start, int end){
-        segTree[node] = new TreeMap<>();
-        for (int i = start; i <= end; i++) {
-            temp = segTree[node].get(arr[i]);
-            if(temp == null){
-                temp = 0;
-            }
-            segTree[node].put(arr[i], temp + 1);
-        }
-        int num = end - start + 1;
-        for ( int key : segTree[node].keySet()) {
-            temp = segTree[node].get(key);
-            segTree[node].put(key, num);
-            num -= temp;
-        }
+
+        mergeSortTree[node] = new int[end - start + 1];
 
         if (start == end) {
+            mergeSortTree[node] = new int[]{arr[start]};
             return;
         }
 
         int mid = (start + end) / 2;
+        init(node*2, start, mid);
+        init(node*2+1, mid+1, end);
 
-        init(
-                node*2,
-                start,
-                mid
-        );
-
-        init(
-                node*2+1,
-                mid+1,
-                end
-        );
+        mergeSortTree[node] = merge(mergeSortTree[node * 2], mergeSortTree[node * 2 + 1]);
     }
 
-    public static void numOfLargerNums(int node, int start, int end, int qStart, int qEnd, int value) {
+    public static int upperBound(int node, int value){
+        int start = 0;
+        int end = mergeSortTree[node].length;
+        int mid;
+        while(start < end){
+            mid = (start + end) / 2;
+            if (mergeSortTree[node][mid] <= value) {
+                start = mid + 1;
+            }else{
+                end = mid;
+            }
+        }
+
+        return end;
+    }
+
+    public static int numOfLargerNums(int node, int start, int end, int qStart, int qEnd, int value) {
 
 //      완전 미포함
-        if(end < qStart || qEnd < start) return;
+        if(end < qStart || qEnd < start) return 0;
 //      완전 포함
         if (qStart <= start && end <= qEnd) {
-            entry = segTree[node].higherEntry(value);
-            if(entry != null){
-                result += entry.getValue();
-            }
-            return;
+//           어퍼바운드 구하는 함수 구현
+            return mergeSortTree[node].length - upperBound(node, value);
         }
 //      그 외
         int mid = (start + end) / 2;
 
-        numOfLargerNums(
-                node*2,
-                start,
-                mid,
-                qStart,
-                qEnd,
-                value
-        );
-
-        numOfLargerNums(
-                node*2+1,
-                mid+1,
-                end,
-                qStart,
-                qEnd,
-                value
-        );
+        return numOfLargerNums(node*2, start, mid, qStart, qEnd, value) +
+                numOfLargerNums(node*2+1, mid+1,end, qStart, qEnd, value);
 
     }
 
@@ -98,7 +91,8 @@ public class Main {
             arr[i] = Integer.parseInt(st.nextToken());
         }
 
-        segTree = new TreeMap[4*N];
+//      트리 초기화
+        mergeSortTree = new int[4 * N][];
         init(1, 1, N);
 
         st = new StringTokenizer(br.readLine());
@@ -112,9 +106,7 @@ public class Main {
             int qEnd = Integer.parseInt(st.nextToken());
             int value = Integer.parseInt(st.nextToken());
 
-            result = 0;
-            numOfLargerNums(1, 1, N, qStart, qEnd, value);
-            sb.append(result).append('\n');
+            sb.append(numOfLargerNums(1, 1, N, qStart, qEnd, value)).append('\n');
         }
 
         System.out.println(sb);
